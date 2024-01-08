@@ -1,0 +1,91 @@
+#### BASE IMAGE ####
+FROM node:20.10.0-slim AS base
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+RUN corepack enable
+WORKDIR /usr/src/app
+
+
+
+#### ROOT WORKSPACE ####
+FROM base AS root-workspace
+
+COPY . /usr/src/app
+
+RUN pnpm --global install turbo
+
+RUN turbo prune --scope=@canny-games/web --docker --out-dir=./out/web
+RUN turbo prune --scope=@canny-games/api --docker --out-dir=./out/api
+RUN turbo prune --scope=@canny-games/common --docker --out-dir=./out/common
+
+
+
+#### PROD DEPENDENCIES STAGE ####
+FROM base AS dependencies
+
+COPY --from=root-workspace /usr/src/app/out/web/json/ /usr/src/app/web/
+COPY --from=root-workspace /usr/src/app/out/api/json/ /usr/src/app/api/
+COPY --from=root-workspace /usr/src/app/out/common/json/ /usr/src/app/common/
+
+WORKDIR /usr/src/app/api
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+
+WORKDIR /usr/src/app/web
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+
+WORKDIR /usr/src/app/common
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+
+
+
+#### API BUILDER STAGE ###
+FROM base AS api-builder
+
+COPY --from=dependencies /usr/src/app/api /usr/src/app/
+COPY --from=root-workspace /usr/src/app/out/api/full /usr/src/app/
+COPY ./node_modules/.cache/turbo ./node_modules/.cache/turbo
+
+RUN pnpm build
+
+
+
+#### API RUNNER STAGE ###
+FROM base AS api-runner
+ENV NODE_ENV=production
+
+COPY --from=dependencies /usr/src/app/api /usr/src/app/
+
+RUN pnpm prune --prod
+
+COPY --from=api-builder /usr/src/app/apps/api/dist /usr/src/app/apps/api/dist
+COPY --from=api-builder /usr/src/app/libs/common/dist /usr/src/app/libs/common/dist
+
+WORKDIR /usr/src/app/apps/api
+
+ENTRYPOINT ["node", "./dist/main.js"]
+
+
+
+#### WEB BUILDER STAGE ####
+FROM base AS web-builder
+
+ARG FRONTEND_BASE_API_URL
+
+COPY --from=dependencies /usr/src/app/web /usr/src/app/
+COPY --from=root-workspace /usr/src/app/out/web/full /usr/src/app/
+COPY ./node_modules/.cache/turbo ./node_modules/.cache/turbo
+
+RUN pnpm build
+
+
+
+#### WEB RUNNER STAGE ####
+FROM base AS web-runner
+
+COPY --from=web-builder /usr/src/app/ /usr/src/app/
+RUN pnpm prune --prod
+
+WORKDIR /usr/src/app/apps/web
+ENTRYPOINT ["pnpm", "preview"]

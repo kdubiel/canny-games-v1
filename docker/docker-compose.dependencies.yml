@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  canny-games-mongo-local:
+    container_name: canny-games-mongo-local
+    image: mongo:6.0.12
+    restart: unless-stopped
+    command: --replSet rs0 --bind_ip localhost,canny-games-mongo-local --quiet
+    ports:
+      - 27017:27017
+    environment:
+      - MONGO_INITDB_DATABASE=canny-games
+    volumes:
+      - ../data/mongodb/db:/data/db
+
+  canny-games-redis-local:
+    container_name: canny-games-redis-local
+    image: redis:7.2.3-alpine
+    ports:
+      - ${REDIS_PORT}:6379
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - ../data/redis/db:/data

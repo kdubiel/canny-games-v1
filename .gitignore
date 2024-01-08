@@ -1,0 +1,33 @@
+# Dependencies
+node_modules
+
+# Environment variables
+.env*
+!.env.local
+!.env.prod
+
+# IDE
+.vscode/settings.json
+.idea
+
+# Bundle
+build
+dist
+
+# Typescript
+*.tsbuildinfo
+
+# Misc
+pnpm-debug.log*
+.DS_Store
+
+# Testing
+coverage
+
+# Data
+/data/mongodb
+/data/redis
+/out
+
+# Turbo
+.turbo

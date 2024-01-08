@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  canny-games-api-prod:
+    container_name: canny-games-api-prod
+    image: canny-games-api-prod
+    depends_on:
+      - canny-games-mongo-local
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile.prod
+      target: api-runner
+    environment:
+      BACKEND_APP_PORT: ${BACKEND_APP_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_URL: ${DB_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+    ports:
+      - ${BACKEND_APP_PORT}:${BACKEND_APP_PORT}
+
+  canny-games-web-prod:
+    container_name: canny-games-web-prod
+    image: canny-games-web-prod
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile.prod
+      target: web-runner
+      args:
+        - FRONTEND_BASE_API_URL=${FRONTEND_BASE_API_URL}
+    environment:
+      FRONTEND_APP_PORT: ${FRONTEND_APP_PORT}
+      FRONTEND_BASE_API_URL: ${FRONTEND_BASE_API_URL}
+      NGINX_PORT: ${NGINX_PORT}
+      NGINX_SERVER_NAME: ${NGINX_SERVER_NAME}
+    ports:
+      - ${FRONTEND_APP_PORT}:${FRONTEND_APP_PORT}

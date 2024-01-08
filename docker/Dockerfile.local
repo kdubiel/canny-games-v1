@@ -1,0 +1,21 @@
+FROM node:20.10.0-bookworm as base
+ENV NODE_ENV=development
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+WORKDIR /usr/src/app
+
+# Setup environment variables required for build to pass
+ENV FRONTEND_BASE_API_URL=$FRONTEND_BASE_API_URL
+
+# Copy root monorepo files
+COPY . .
+
+# Setup pNPM store
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+  pnpm install --prefer-offline --frozen-lockfile --unsafe-perm
+
+RUN pnpm build
+
+# Execute command
+ENTRYPOINT ["pnpm", "start:dev"]

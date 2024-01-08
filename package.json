@@ -1,0 +1,56 @@
+{
+  "name": "canny-games",
+  "version": "0.0.0",
+  "private": true,
+  "author": "Kamil Dubiel <kamdubdev@gmail.com>",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": "^20",
+    "pnpm": "^8"
+  },
+  "packageManager": "pnpm@8.14.0",
+  "scripts": {
+    "build": "turbo run build",
+    "build:docker": "pnpm docker:base:local build",
+    "build:docker:prod": "pnpm docker:base:prod build",
+    "check:licenses": "node check-licenses.js",
+    "docker:base:local": "docker compose --env-file .env --env-file .env.local -f docker/docker-compose.dependencies.yml -f docker/docker-compose.local.yml",
+    "docker:base:prod": "docker compose --env-file .env --env-file .env.prod -f docker/docker-compose.dependencies.yml -f docker/docker-compose.prod.yml",
+    "initialize": "bash ./scripts/initialize.sh",
+    "lint": "turbo run --continue --log-order grouped lint",
+    "lint:root": "eslint .",
+    "migrate": "docker exec -it canny-games-local sh -c \"pnpm --filter @canny-games/api migrate\"",
+    "migration:create": "docker exec -it canny-games-local sh -c \"pnpm --filter @canny-games/api migration:create\"",
+    "postinstall": "husky install",
+    "prettier:check": "prettier . --check '!./data'",
+    "prettier:fix": "prettier . --write '!./data'",
+    "pre-commit": "lint-staged",
+    "pre-push": "pnpm lint && pnpm test:unit",
+    "start:dev": "turbo run start:dev --continue",
+    "start:docker": "pnpm docker:base:local up -V",
+    "start:docker:prod": "pnpm docker:base:prod up",
+    "test:coverage": "turbo run test:coverage --continue",
+    "test:unit": "turbo run test:unit --continue",
+    "test:watch": "turbo run test:watch --continue"
+  },
+  "dependencies": {
+    "turbo": "1.11.2"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "6.17.0",
+    "@typescript-eslint/parser": "6.17.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-import-resolver-typescript": "3.6.1",
+    "eslint-plugin-import": "2.29.1",
+    "eslint-plugin-jsx-a11y": "6.8.0",
+    "eslint-plugin-no-only-tests": "3.1.0",
+    "eslint-plugin-prettier": "5.1.2",
+    "eslint-plugin-react": "7.33.2",
+    "eslint-plugin-react-hooks": "4.6.0",
+    "husky": "8.0.3",
+    "license-checker-rseidelsohn": "4.3.0",
+    "lint-staged": "15.2.0",
+    "prettier": "3.1.1",
+    "typescript": "5.3.3"
+  }
+}

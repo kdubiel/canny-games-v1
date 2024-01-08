@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  canny-games-local:
+    container_name: canny-games-local
+    image: canny-games-local
+    depends_on:
+      - canny-games-mongo-local
+    build:
+      context: ..
+      dockerfile: ./docker/Dockerfile.local
+    ports:
+      - ${BACKEND_APP_PORT}:${BACKEND_APP_PORT}
+      - ${FRONTEND_APP_PORT}:${FRONTEND_APP_PORT}
+    environment:
+      BACKEND_APP_PORT: ${BACKEND_APP_PORT}
+      FRONTEND_APP_PORT: ${FRONTEND_APP_PORT}
+      FRONTEND_BASE_API_URL: ${FRONTEND_BASE_API_URL}
+      DB_NAME: ${DB_NAME}
+      DB_URL: ${DB_URL}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+    volumes:
+      - ..:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/apps/web/node_modules
+      - /usr/src/app/apps/api/node_modules

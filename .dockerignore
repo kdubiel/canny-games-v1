@@ -1,0 +1,18 @@
+**/node_modules/
+**/build/
+**/dist/
+**/tsconfig.tsbuildinfo
+
+**/Dockerfile*
+**/.dockerignore
+
+**/*.log
+**/.env*
+
+**/coverage-summary
+
+data/mongodb
+
+# Allow Turborepo cache directories
+!node_modules/.cache/turbo
+!/**/.turbo

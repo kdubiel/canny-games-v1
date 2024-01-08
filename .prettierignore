@@ -1,0 +1,39 @@
+# Dependency
+node_modules
+pnpm-lock.yaml
+.pnpm-store
+
+# Build
+build
+dist
+
+# VSCode
+.vscode/settings.json
+
+# Log
+*.log
+
+# Turborepo
+.turbo
+
+# Unsupported extensions
+*.txt
+*.md
+
+*.ico
+*.png
+*.jpg
+*.svg
+*.sh
+*.ttf
+
+# Unsupported files
+.gitignore
+.eslintignore
+.prettierignore
+.dockerignore
+.npmrc
+.nvmrc
+
+.env*
+Dockerfile*

@@ -1,0 +1,29 @@
+{
+  "baseBranch": "origin/master",
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "build/**"]
+    },
+    "start:dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "cache": true
+    },
+    "test:unit": {
+      "dependsOn": ["^build", "^test:unit"],
+      "cache": true
+    },
+    "test:coverage": {
+      "dependsOn": ["^build", "^test:coverage"],
+      "cache": true
+    },
+    "test:watch": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    }
+  }
+}
